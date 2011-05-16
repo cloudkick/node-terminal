@@ -76,10 +76,58 @@ exports['test_prompt'] = function(test, assert) {
 };
 
 exports['test_formatTags'] = function(test, assert) {
+  var i, string, expectedString;
+  var strings = [
+    'foo',
+    '[inextsitent]test[/inextsitent]',
+    '[blue]test[/blue]',
+    '[blue]test[/red]'
+  ];
+
+  var expectedStrings = [
+    'foo',
+    '[inextsitent]test[/inextsitent]',
+    'test',
+    '[blue]test[/red]'
+  ];
+
+  function replaceFunction(str, p1, p2, p3) {
+    return p3;
+  }
+
+  for (i = 0; i < strings.length; i++) {
+    string = strings[i];
+    expectedString = expectedStrings[i];
+
+    assert.equal(terminal.formatTags(string, replaceFunction), expectedString);
+  }
+
   test.finish();
 };
 
 exports['test_stylize'] = function(test, assert) {
+  var i, string, expectedString;
+  var strings = [
+    'foo',
+    '[inextsitent]test[/inextsitent]',
+    '[blue]test[/blue]',
+    '[blue]test[/red]'
+  ];
+
+  var expectedStrings = [
+    'foo',
+    '[inextsitent]test[/inextsitent]',
+    '\u001b[34mtest\u001b[39m',
+    '[blue]test[/red]'
+  ];
+
+  for (i = 0; i < strings.length; i++) {
+    string = strings[i];
+    expectedString = expectedStrings[i];
+
+    assert.equal(terminal.stylize(string), expectedString);
+  }
+
   test.finish();
 };
 
