@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-var terminal = require('../index');
+var terminal = require('terminal');
 
 exports['test_getStylesLength'] = function(test, assert) {
   var i, string, styleLength;
@@ -72,6 +72,32 @@ exports['test_printWrapped'] = function(test, assert) {
 };
 
 exports['test_prompt'] = function(test, assert) {
+  var buffer = '';
+  var gotResult = false;
+  var exceptionCount = 0;
+  var oldProcess = process;
+
+  // @TODO: Mock process.stdin and verify the whole flow
+
+  function printFunc(data) {
+    buffer += data;
+  }
+
+  function handleResult(input) {
+    gotResult = true;
+  }
+
+  try {
+    terminal.prompt('test question?', ['y', 'n'], 'u', handleResult);
+  }
+  catch (err) {
+    exceptionCount++;
+    assert.match(err.message, /invalid default option/i);
+  }
+
+  process = oldProcess;
+
+  assert.equal(exceptionCount, 1);
   test.finish();
 };
 
@@ -108,6 +134,7 @@ exports['test_formatTags'] = function(test, assert) {
 exports['test_stylize'] = function(test, assert) {
   var i, string, expectedString;
   var strings = [
+    '',
     'foo',
     '[inextsitent]test[/inextsitent]',
     '[blue]test[/blue]',
@@ -115,6 +142,7 @@ exports['test_stylize'] = function(test, assert) {
   ];
 
   var expectedStrings = [
+    '',
     'foo',
     '[inextsitent]test[/inextsitent]',
     '\u001b[34mtest\u001b[39m',
