@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+var util = require('util');
+var events = require('events');
+
 var terminal = require('terminal');
 
 exports['test_getStylesLength'] = function(test, assert) {
@@ -75,11 +78,23 @@ exports['test_prompt'] = function(test, assert) {
   var buffer = '';
   var gotResult = false;
   var exceptionCount = 0;
-  var oldProcess = process;
+  var oldPutsFunc = terminal.PUTS_FUNC;
+  var oldOpenStdin = process.openStdin;
+
+  function MockStdin() {
+  }
+
+  util.inherits(MockStdin, events.EventEmitter);
+
+  MockStdin.prototype.pause = function() {};
+  MockStdin.prototype.resume = function() {};
+  MockStdin.prototype._emitData = function(data) {
+    this.emit(data);
+  };
 
   // @TODO: Mock process.stdin and verify the whole flow
 
-  function printFunc(data) {
+  function bufferFunc(data) {
     buffer += data;
   }
 
@@ -87,17 +102,33 @@ exports['test_prompt'] = function(test, assert) {
     gotResult = true;
   }
 
+  // Test invalid default option
   try {
-    terminal.prompt('test question?', ['y', 'n'], 'u', handleResult);
+    terminal.prompt('test question?', ['y', 'n'], 'u', bufferFunc, handleResult);
   }
   catch (err) {
     exceptionCount++;
     assert.match(err.message, /invalid default option/i);
   }
 
-  process = oldProcess;
+  // Test normal flow
+  var mockStdinInstance = new MockStdin();
+  process.openStdin = function() {
+    return mockStdinInstance;
+  };
 
+  // Invalid option
+  terminal.prompt('yes?', ['y', 'n'], 'n', bufferFunc, handleResult);
+  mockStdinInstance.emit('data', 'x');
+
+  // Valid result, callback should be called
+  mockStdinInstance.emit('data', 'y');
+
+  process.openStdin = oldOpenStdin;
   assert.equal(exceptionCount, 1);
+  assert.ok(gotResult);
+  assert.ok(buffer.indexOf('Invalid option "x"') !== -1);
+  assert.ok(buffer.indexOf('Invalid option "x"') !== -1);
   test.finish();
 };
 
