@@ -4,11 +4,11 @@
   "version": "0.1.2",
   "author": "Cloudkick, Inc. <tomaz+npm@cloudkick.com> http://www.cloudkick.com",
   "keywords": [ "terminal", "term", "colors", "style" ],
-  "homepage": "https://github.com/cloudkick/terminal",
+  "homepage": "https://github.com/cloudkick/node-terminal",
   "license": "Apache 2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/cloudkick/terminal.git"
+    "url": "git://github.com/cloudkick/node-terminal.git"
   },
   "modules": {
     "terminal": "./lib/terminal",
