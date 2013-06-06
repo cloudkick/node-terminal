@@ -27,10 +27,7 @@
     "type": "git",
     "url": "git://github.com/cloudkick/node-terminal.git"
   },
-  "modules": {
-    "terminal": "./lib/terminal",
-    "spinner": "./lib/spinner"
-  },
+  "main": "./lib/index",
   "directories": {
     "lib": "./lib",
     "example": "./example"
