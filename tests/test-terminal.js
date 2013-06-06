@@ -111,6 +111,8 @@ exports['test_prompt'] = function(test, assert) {
     assert.match(err.message, /invalid default option/i);
   }
 
+  process.stdin.destroy();
+
   // Test normal flow
   var mockStdinInstance = new MockStdin();
   process.openStdin = function() {
